@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Intake Journey Map</title>
+<style>
+  :root {
+    --bg: #0a0e14; --surface: #0f1620; --surface-2: #131c28; --border: #1f2a37;
+    --text: #e5edf5; --muted: #8b9bb0; --accent: #22d3ee;
+    --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; color: var(--text); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.55;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(ellipse at 50% -10%, rgba(34, 211, 238, 0.10), transparent 60%),
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 32px 32px, 32px 32px;
+    background-attachment: fixed;
+  }
+  main { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+
+  /* Header and nav */
+  .eyebrow { font-family: var(--mono); font-size: 0.8rem; letter-spacing: 0.12em; color: var(--accent); margin: 0 0 0.5rem; }
+  h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 0.75rem; letter-spacing: -0.02em; }
+  .intro { color: var(--muted); max-width: 60ch; margin: 0 0 1.5rem; }
+  nav { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 3rem; }
+  nav a {
+    font-family: var(--mono); font-size: 0.85rem; color: var(--text); text-decoration: none;
+    padding: 0.45rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--surface);
+  }
+  nav a:hover { border-color: var(--accent); color: var(--accent); }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+  /* Section headings */
+  section { margin-bottom: 4rem; scroll-margin-top: 1.5rem; }
+  h2 { font-size: 1.4rem; margin: 0 0 0.35rem; }
+  h2 .tag { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); margin-right: 0.5rem; }
+  .section-note { color: var(--muted); margin: 0 0 1.5rem; }
+
+  /* The map: vertical pipeline */
+  .map { list-style: none; margin: 0; padding: 0 0 0 2.25rem; position: relative; }
+  .map::before {
+    content: ""; position: absolute; left: 0.7rem; top: 0.5rem; bottom: 0.5rem; width: 2px;
+    background: linear-gradient(var(--accent), rgba(34, 211, 238, 0.15));
+  }
+  .step { position: relative; margin-bottom: 1rem; }
+  .step::before {
+    content: ""; position: absolute; left: -1.85rem; top: 1.35rem; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--bg); border: 2px solid var(--accent); box-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { border-color: rgba(34, 211, 238, 0.5); box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.15), 0 0 24px rgba(34, 211, 238, 0.08); }
+  .num { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); letter-spacing: 0.08em; }
+  .card h3 { margin: 0.2rem 0 0.25rem; font-size: 1.1rem; }
+  .card p { margin: 0; color: var(--muted); }
+
+  /* Glossary */
+  .glossary { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 0; }
+  .term { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 1rem; }
+  .term dt { font-weight: 600; margin-bottom: 0.2rem; }
+  .term dd { margin: 0; color: var(--muted); font-size: 0.92rem; }
+
+  /* Open questions */
+  .questions { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+  .questions li {
+    background: var(--surface); border: 1px dashed var(--border); border-radius: 10px; padding: 0.75rem 1rem 0.75rem 2.5rem; position: relative;
+  }
+  .questions li::before { content: "?"; position: absolute; left: 1rem; font-family: var(--mono); color: var(--accent); font-weight: 700; }
+
+  footer { border-top: 1px solid var(--border); padding-top: 1.25rem; color: var(--muted); font-size: 0.85rem; font-family: var(--mono); }
+
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .card { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">INTAKE // LEAD JOURNEY</p>
+    <h1>Intake Journey Map</h1>
+    <p class="intro">How a lead moves through intake, from first contact to a signed or declined case. Follow the eight steps below.</p>
+    <nav aria-label="Page sections">
+      <a href="#map">01 · The journey</a>
+      <a href="#glossary">02 · Glossary</a>
+      <a href="#questions">03 · Open questions</a>
+    </nav>
+  </header>
+
+  <section id="map">
+    <h2><span class="tag">01</span>The journey</h2>
+    <p class="section-note">Eight steps from first contact to outcome.</p>
+    <ol class="map" id="steps"></ol>
+  </section>
+
+  <section id="glossary">
+    <h2><span class="tag">02</span>Glossary</h2>
+    <p class="section-note">Terms used on this page, in plain language.</p>
+    <dl class="glossary" id="terms"></dl>
+  </section>
+
+  <section id="questions">
+    <h2><span class="tag">03</span>Open questions</h2>
+    <p class="section-note">Things not yet confirmed about the workflow. Each answer will update the map.</p>
+    <ul class="questions" id="questionList"></ul>
+  </section>
+
+  <footer>System names are generic on purpose. No real client or company data is shown.</footer>
+</main>
+
+<script>
+  // ======== CONTENT: edit text here without touching the layout below ========
+
+  const STEPS = [
+    {
+      title: "Lead comes in",
+      summary: "A lead reaches the firm by phone call, text, or web form.",
+      details: [
+        "Three ways in: a phone call, a text, or a web form.",
+        "A lead can come from the firm's own marketing or be purchased from a lead vendor. A purchased lead still arrives as one of those three ways, and some purchased phone leads are live transfers.",
+        "Phone numbers include paid search lines, local services ad lines, office lines, and a vanity number that forwards to a paid search line."
+      ],
+      record: "None yet.",
+      issue: "A forwarded number takes on the attribution of the line it forwards to, so vanity callers get counted as paid search.",
+      toConfirm: []
+    },
+    {
+      title: "Source assigned",
+      summary: "The lead gets credited to a marketing source.",
+      details: [
+        "For calls, the intake platform looks up the dialed number's inbound route. The route sets the call's lead method (the marketing source).",
+        "A blank lead method means organic, on purpose."
+      ],
+      record: "None of its own. The lead method it sets is carried onto the intake later.",
+      issue: "If a route has no lead method set, every call on that line lands in the organic bucket, even when it's a paid line.",
+      toConfirm: [
+        "How texts and web forms get their source.",
+        "How a purchased lead gets credited to its vendor."
+      ]
+    },
+    {
+      title: "Who picks it up",
+      summary: "A live agent, the AI voice agent, or an agent callback handles the lead first.",
+      details: [
+        "Live agent: the lead enters a queue in the phone system, and the screen-pop tool puts it on an agent's screen.",
+        "AI voice agent (live calls only): it either completes the intake on the call or takes a message. It can't transfer the caller to a person.",
+        "Agent callback: texts, web forms, and missed calls that leave a voicemail get an outbound call from an agent."
+      ],
+      record: "None.",
+      issue: "The AI voice agent saves the phone number it hears the caller say instead of the caller ID, so some records carry the wrong number.",
+      toConfirm: [
+        "What decides whether a live call goes to a live agent or the AI voice agent.",
+        "Whether the AI voice agent ever answers live transfers from vendors.",
+        "What happens to a message the AI voice agent takes."
+      ]
+    },
+    {
+      title: "Intake created",
+      summary: "The intake record is created when the lead pops on an agent's screen.",
+      details: [
+        "When the screen-pop tool puts a lead on an agent's screen, the intake platform creates an intake record right away and holds it in a hidden queue.",
+        "Web forms also pop to an agent's screen, so a web form's intake is created at the pop, before the agent makes the callback.",
+        "A caller who hangs up before the screen pop leaves no intake. If they left a voicemail, the callback route picks them up."
+      ],
+      record: "The intake.",
+      issue: "",
+      toConfirm: [
+        "When the intake is created for texts, voicemail callbacks, and calls the AI voice agent completes.",
+        "Whether a missed call with no voicemail gets any follow-up, or ends with no intake."
+      ]
+    },
+    {
+      title: "Intake completed and saved",
+      summary: "The intake is filled in and saved.",
+      details: [
+        "The agent (or the AI voice agent, on intakes it completes) fills in the intake and saves it.",
+        "Personal details usually get entered. Marketing fields often get skipped."
+      ],
+      record: "The saved intake.",
+      issue: "Skipped marketing fields make it hard to trace where a lead came from later.",
+      toConfirm: []
+    },
+    {
+      title: "Case decision",
+      summary: "A person decides to sign or decline the case.",
+      details: [
+        "A person always makes this call.",
+        "A qualified intake agent can sign the case on the spot, or an attorney reviews the intake and tells the agent to sign or decline.",
+        "The AI voice agent can't sign or decline."
+      ],
+      record: "The intake is marked signed or declined in the intake platform.",
+      issue: "",
+      toConfirm: [
+        "How an intake the AI voice agent completes reaches a person for the decision.",
+        "Whether every intake reaches this decision, or some stop earlier (for example, a lead who's never reached on a callback)."
+      ]
+    },
+    {
+      title: "Pushed to case management",
+      summary: "The decision is sent to the case management system automatically.",
+      details: [
+        "Once the intake is marked signed or declined, it's pushed to the case management system automatically."
+      ],
+      record: "The intake arrives in case management.",
+      issue: "",
+      toConfirm: []
+    },
+    {
+      title: "Outcome",
+      summary: "Signed cases become matters. Declined intakes don't.",
+      details: [
+        "Signed: a matter is created automatically.",
+        "Declined: the intake still lands in case management, but no matter is created."
+      ],
+      record: "A matter, for signed cases only.",
+      issue: "",
+      toConfirm: []
+    }
+  ];
+
+  const GLOSSARY = [
+    ["Lead", "Someone reaching out to the firm about a possible case"],
+    ["Entry point", "How a lead arrives: a phone call, a text, or a web form"],
+    ["Pickup route", "Who handles the lead first: a live agent, the AI voice agent, or an agent callback"],
+    ["Live agent", "A person who answers a lead when the screen-pop tool puts it on their screen"],
+    ["AI voice agent", "An AI that answers live calls; it completes the intake or takes a message"],
+    ["Agent callback", "An agent makes an outbound call to a lead who texted, sent a web form, or left a voicemail"],
+    ["Intake", "The record an agent (or the AI voice agent) fills in about a lead and their possible case"],
+    ["Intake platform", "The system where intakes are created, filled in, and saved"],
+    ["Phone system queue", "Where incoming leads wait until an agent is free"],
+    ["Screen-pop tool", "Puts a lead on an agent's screen when it comes off the queue"],
+    ["Hidden queue", "Where a new intake sits from the screen pop until the agent saves it"],
+    ["Inbound route", "The setting that ties a phone number to a lead method"],
+    ["Lead method", "The marketing source a lead gets credited to"],
+    ["Attribution", "Which marketing source gets credit for a lead"],
+    ["Organic", "A lead with no lead method. Meant to mean no paid source, but calls on a paid line with no lead method also land here"],
+    ["Marketing fields", "The parts of an intake that record where the lead came from"],
+    ["Paid search line", "A phone number shown in paid search ads"],
+    ["Local services ad line", "A phone number shown in local services ads"],
+    ["Vanity number", "An easy-to-remember phone number that forwards to another line"],
+    ["Caller ID", "The number the phone system sees the call coming from"],
+    ["Lead vendor", "An outside company the firm buys leads from"],
+    ["Live transfer", "A vendor connects a caller straight through to the firm"],
+    ["Sign / decline", "The decision to take the case or turn it down"],
+    ["Case management system", "Where cases are worked after intake"],
+    ["Matter", "The case record in case management, created only when a case is signed"],
+    ["To confirm", "Something not yet known about the workflow. It stays marked until answered"]
+  ];
+
+  const OPEN_QUESTIONS = [
+    "How do texts and web forms get their source?",
+    "How does a purchased lead get credited to the vendor it came from?",
+    "What decides whether a live call goes to a live agent or the AI voice agent?",
+    "Does the AI voice agent ever answer live transfers from vendors?",
+    "What happens to a message the AI voice agent takes?",
+    "When is the intake created for texts, voicemail callbacks, and calls the AI voice agent completes?",
+    "Does a missed call with no voicemail get any follow-up, or does it end with no intake?",
+    "How does an intake the AI voice agent completes reach an agent or attorney for the decision?",
+    "Does every intake reach a sign or decline decision, or do some stop earlier?"
+  ];
+
+  // ======== LAYOUT: builds the page from the content above ========
+
+  const stepsEl = document.getElementById('steps');
+  STEPS.forEach((step, i) => {
+    const li = document.createElement('li');
+    li.className = 'step';
+    li.innerHTML = `
+      <div class="card">
+        <span class="num">STEP ${String(i + 1).padStart(2, '0')}</span>
+        <h3></h3>
+        <p></p>
+      </div>`;
+    li.querySelector('h3').textContent = step.title;
+    li.querySelector('p').textContent = step.summary;
+    stepsEl.appendChild(li);
+  });
+
+  const termsEl = document.getElementById('terms');
+  GLOSSARY.forEach(([term, meaning]) => {
+    const div = document.createElement('div');
+    div.className = 'term';
+    const dt = document.createElement('dt'); dt.textContent = term;
+    const dd = document.createElement('dd'); dd.textContent = meaning;
+    div.append(dt, dd);
+    termsEl.appendChild(div);
+  });
+
+  const qEl = document.getElementById('questionList');
+  OPEN_QUESTIONS.forEach(q => {
+    const li = document.createElement('li');
+    li.textContent = q;
+    qEl.appendChild(li);
+  });
+</script>
+</body>
+</html>
