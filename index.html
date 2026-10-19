@@ -6,8 +6,8 @@
 <title>Intake Journey Map</title>
 <style>
   :root {
-    --bg: #0a0e14; --surface: #0f1620; --surface-2: #131c28; --border: #1f2a37;
-    --text: #e5edf5; --muted: #8b9bb0; --accent: #22d3ee;
+    --bg: #0a0e14; --surface: #0f1620; --surface-2: #121b27; --border: #1f2a37;
+    --text: #e5edf5; --muted: #8b9bb0; --accent: #22d3ee; --warn: #fbbf24;
     --mono: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   }
   * { box-sizing: border-box; }
@@ -34,7 +34,7 @@
     padding: 0.45rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: var(--surface);
   }
   nav a:hover { border-color: var(--accent); color: var(--accent); }
-  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
   /* Section headings */
   section { margin-bottom: 4rem; scroll-margin-top: 1.5rem; }
@@ -54,13 +54,40 @@
     background: var(--bg); border: 2px solid var(--accent); box-shadow: 0 0 10px rgba(34, 211, 238, 0.6);
   }
   .card {
+    display: block; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer;
     background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .card:hover { border-color: rgba(34, 211, 238, 0.5); box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.15), 0 0 24px rgba(34, 211, 238, 0.08); }
+  .card:hover, .card.selected { border-color: rgba(34, 211, 238, 0.6); box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2), 0 0 24px rgba(34, 211, 238, 0.10); }
+  .card.selected { background: var(--surface-2); }
   .num { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); letter-spacing: 0.08em; }
   .card h3 { margin: 0.2rem 0 0.25rem; font-size: 1.1rem; }
   .card p { margin: 0; color: var(--muted); }
+  .card .more { display: block; margin-top: 0.5rem; font-family: var(--mono); font-size: 0.78rem; color: var(--accent); }
+
+  /* Detail panel: slides in from the right */
+  .panel {
+    position: fixed; top: 0; right: 0; height: 100vh; width: min(420px, 100%); z-index: 10;
+    background: var(--surface-2); border-left: 1px solid var(--border); box-shadow: -20px 0 40px rgba(0, 0, 0, 0.45);
+    padding: 1.5rem 1.5rem 2.5rem; overflow-y: auto;
+    transform: translateX(100%); visibility: hidden;
+    transition: transform 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .panel.open { transform: none; visibility: visible; transition: transform 0.25s ease; }
+  .panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+  .panel h3 { margin: 0.2rem 0 1rem; font-size: 1.4rem; line-height: 1.2; }
+  .close {
+    font: inherit; font-family: var(--mono); font-size: 0.85rem; color: var(--text); cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.35rem 0.7rem;
+  }
+  .close:hover { border-color: var(--accent); color: var(--accent); }
+  .label { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.1em; color: var(--muted); margin: 1.25rem 0 0.4rem; }
+  .panel p { margin: 0 0 0.6rem; }
+  .record { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.8rem; }
+  .issue { border: 1px solid rgba(251, 191, 36, 0.5); background: rgba(251, 191, 36, 0.07); border-radius: 8px; padding: 0.6rem 0.8rem; }
+  .issue .label { color: var(--warn); margin-top: 0; }
+  .confirm { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+  .confirm li { border: 1px dashed var(--border); border-radius: 8px; padding: 0.5rem 0.8rem; color: var(--muted); }
 
   /* Glossary */
   .glossary { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; margin: 0; }
@@ -77,7 +104,20 @@
 
   footer { border-top: 1px solid var(--border); padding-top: 1.25rem; color: var(--muted); font-size: 0.85rem; font-family: var(--mono); }
 
-  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .card { transition: none; } }
+  /* Phone: panel slides up from the bottom */
+  @media (max-width: 640px) {
+    h1 { font-size: 1.9rem; }
+    .panel {
+      top: auto; bottom: 0; height: 80vh; width: 100%;
+      border-left: none; border-top: 1px solid var(--border); border-radius: 16px 16px 0 0;
+      transform: translateY(100%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .card, .panel, .panel.open { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -85,7 +125,7 @@
   <header>
     <p class="eyebrow">INTAKE // LEAD JOURNEY</p>
     <h1>Intake Journey Map</h1>
-    <p class="intro">How a lead moves through intake, from first contact to a signed or declined case. Follow the eight steps below.</p>
+    <p class="intro">How a lead moves through intake, from first contact to a signed or declined case. Click any step to see what happens there.</p>
     <nav aria-label="Page sections">
       <a href="#map">01 · The journey</a>
       <a href="#glossary">02 · Glossary</a>
@@ -113,6 +153,16 @@
 
   <footer>System names are generic on purpose. No real client or company data is shown.</footer>
 </main>
+
+<!-- Step detail panel -->
+<aside class="panel" id="panel" role="dialog" aria-modal="false" aria-labelledby="panelTitle">
+  <div class="panel-head">
+    <span class="num" id="panelNum"></span>
+    <button class="close" id="closeBtn" aria-label="Close step details">Close ✕</button>
+  </div>
+  <h3 id="panelTitle"></h3>
+  <div id="panelBody"></div>
+</aside>
 
 <script>
   // ======== CONTENT: edit text here without touching the layout below ========
@@ -267,21 +317,29 @@
 
   // ======== LAYOUT: builds the page from the content above ========
 
+  const stepNum = i => `STEP ${String(i + 1).padStart(2, '0')}`;
+
+  // Step cards (now clickable buttons)
   const stepsEl = document.getElementById('steps');
+  const cardButtons = [];
   STEPS.forEach((step, i) => {
     const li = document.createElement('li');
     li.className = 'step';
-    li.innerHTML = `
-      <div class="card">
-        <span class="num">STEP ${String(i + 1).padStart(2, '0')}</span>
-        <h3></h3>
-        <p></p>
-      </div>`;
-    li.querySelector('h3').textContent = step.title;
-    li.querySelector('p').textContent = step.summary;
+    const btn = document.createElement('button');
+    btn.className = 'card';
+    btn.setAttribute('aria-expanded', 'false');
+    btn.setAttribute('aria-controls', 'panel');
+    btn.innerHTML = `<span class="num"></span><h3></h3><p></p><span class="more">View details →</span>`;
+    btn.querySelector('.num').textContent = stepNum(i);
+    btn.querySelector('h3').textContent = step.title;
+    btn.querySelector('p').textContent = step.summary;
+    btn.addEventListener('click', () => (openIndex === i ? closePanel() : openPanel(i)));
+    li.appendChild(btn);
     stepsEl.appendChild(li);
+    cardButtons.push(btn);
   });
 
+  // Glossary
   const termsEl = document.getElementById('terms');
   GLOSSARY.forEach(([term, meaning]) => {
     const div = document.createElement('div');
@@ -292,12 +350,78 @@
     termsEl.appendChild(div);
   });
 
+  // Open questions
   const qEl = document.getElementById('questionList');
   OPEN_QUESTIONS.forEach(q => {
     const li = document.createElement('li');
     li.textContent = q;
     qEl.appendChild(li);
   });
+
+  // ======== DETAIL PANEL ========
+
+  const panel = document.getElementById('panel');
+  const panelNum = document.getElementById('panelNum');
+  const panelTitle = document.getElementById('panelTitle');
+  const panelBody = document.getElementById('panelBody');
+  const closeBtn = document.getElementById('closeBtn');
+  let openIndex = null;
+
+  function el(tag, className, text) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text) e.textContent = text;
+    return e;
+  }
+
+  function openPanel(i) {
+    const step = STEPS[i];
+    panelNum.textContent = stepNum(i);
+    panelTitle.textContent = step.title;
+    panelBody.innerHTML = '';
+
+    panelBody.appendChild(el('p', 'label', 'WHAT HAPPENS'));
+    step.details.forEach(d => panelBody.appendChild(el('p', '', d)));
+
+    panelBody.appendChild(el('p', 'label', 'RECORD CREATED'));
+    panelBody.appendChild(el('p', 'record', step.record));
+
+    if (step.issue) {
+      const box = el('div', 'issue');
+      box.appendChild(el('p', 'label', '⚠ KNOWN ISSUE'));
+      box.appendChild(el('p', '', step.issue));
+      panelBody.appendChild(el('p', 'label', ''));
+      panelBody.appendChild(box);
+    }
+
+    if (step.toConfirm.length) {
+      panelBody.appendChild(el('p', 'label', 'TO CONFIRM'));
+      const ul = el('ul', 'confirm');
+      step.toConfirm.forEach(t => ul.appendChild(el('li', '', t)));
+      panelBody.appendChild(ul);
+    }
+
+    cardButtons.forEach((b, j) => {
+      b.classList.toggle('selected', j === i);
+      b.setAttribute('aria-expanded', String(j === i));
+    });
+    openIndex = i;
+    panel.classList.add('open');
+    panel.scrollTop = 0;
+    closeBtn.focus();
+  }
+
+  function closePanel() {
+    if (openIndex === null) return;
+    const returnTo = cardButtons[openIndex];
+    panel.classList.remove('open');
+    cardButtons.forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-expanded', 'false'); });
+    openIndex = null;
+    returnTo.focus();
+  }
+
+  closeBtn.addEventListener('click', closePanel);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
 </script>
 </body>
 </html>
